@@ -2,7 +2,7 @@
  * Client.java
  *
  * Copyright 2019.02.01 Vasiliy Petukhov
- * 
+ *
  * @version 1.0
  */
 package me.nyanguymf.console.server.types;
@@ -36,6 +36,18 @@ public final class Client implements Authorizable {
     /* Don't use it! Just for ConfigLib. */
     public Client() {
         this("", "", true);
+    }
+
+    /**
+     * Gets Client from {@link Authorizable} instance.
+     *
+     * @param instance {@link Authorizable} instance to copy.
+     */
+    public Client(Authorizable instance) {
+        this.authTries = instance.getAuthTries();
+        this.isAuthorized = instance.isAuthorized();
+        this.passHash = instance.getPassHash();
+        this.login = instance.getLogin();
     }
 
     /**
@@ -75,14 +87,14 @@ public final class Client implements Authorizable {
     public String getLogin() {
         return this.login;
     }
-    
+
     @Override
     public String getPassHash() {
         return this.passHash;
     }
 
-    /** Prepares client to saving and unloading. */
-    public void unload() {
+    @Override
+    public void deauthorize() {
         this.authTries = 0;
         this.isAuthorized = false;
     }

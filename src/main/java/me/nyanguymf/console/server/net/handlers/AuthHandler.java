@@ -63,7 +63,7 @@ public final class AuthHandler extends PacketHandler {
             return;
         }
 
-        this.storage.addAuthorized(this.conn);
+        this.storage.addAuthorized(this.conn,(Client) client);
         authSuccess();
     }
 

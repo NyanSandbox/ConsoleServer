@@ -2,7 +2,7 @@
  * Connection.java
  *
  * Copyright 2019.01.29 Vasiliy Petukhov
- * 
+ *
  * @version 1.0
  */
 package me.nyanguymf.console.server.net;
@@ -47,7 +47,7 @@ public final class Connection {
         this.connection = socket;
 
         this.out = new OutputManager(connection.getOutputStream());
-        this.in  = new InputManager(connection.getInputStream(), out, plugin);
+        this.in  = new InputManager(connection.getInputStream(), out, plugin, this);
 
         this.in.runTaskAsynchronously(plugin);
 
@@ -58,12 +58,14 @@ public final class Connection {
     /** Closes socket and I/O connections. */
     public void close() {
         try {
-            this.in.cancel();
-            this.out.close();
             this.connection.close();
+            this.out.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        /* Deauthorize current client on close. */
+        this.storage.getAuthorized().get(this).deauthorize();
 
         if (!this.in.isCancelled())
             this.in.cancel();

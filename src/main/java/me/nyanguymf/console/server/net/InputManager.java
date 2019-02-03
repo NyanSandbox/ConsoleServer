@@ -28,6 +28,7 @@ class InputManager extends BukkitRunnable {
     private AsyncClientInputEvent event;
     private ObjectInputStream in;
     private JavaPlugin plugin;
+    private Connection conn;
 
     /**
      * Creates new input stream.
@@ -37,15 +38,19 @@ class InputManager extends BukkitRunnable {
      * @param   in          Input stream to create {@link ObjectInputStream}.
      * @param   out         Output manager to send results of handled objects.
      * @param   plugin      Main plug-in class instance.
+     * @param   conn        Current connection.
      *
      * @throws  IOException if unable to create Input stream.
      */
     public InputManager(final InputStream in
                     , final OutputManager out
-                    , JavaPlugin plugin) throws IOException {
+                    , JavaPlugin plugin
+                    , Connection conn) throws IOException {
+
         this.in     = new ObjectInputStream(in);
         this.event  = new AsyncClientInputEvent(out);
         this.plugin = plugin;
+        this.conn   = conn;
     }
 
     @Override
@@ -62,11 +67,11 @@ class InputManager extends BukkitRunnable {
                     obj = in.readObject();
                 } catch (SocketException expected) {
                     System.err.println("Lost connection");
-                    this.cancel();
+                    this.closeAll();
                     break;
                 } catch (EOFException expected) {
                     System.err.println("Lost connection");
-                    this.cancel();
+                    this.closeAll();
                     break;
                 }
 
@@ -100,5 +105,9 @@ class InputManager extends BukkitRunnable {
         }
 
         super.cancel();
+    }
+
+    private void closeAll() {
+        this.conn.close();
     }
 }

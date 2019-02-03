@@ -12,12 +12,15 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import me.nyanguymf.console.server.types.Client;
 import me.nyanguymf.console.server.types.ClientsConfig;
 import me.nyanguymf.console.server.types.ConnectionStorage;
 import me.nyanguymf.console.server.types.LocaleStorage;
@@ -29,7 +32,7 @@ public class ConnectionManager extends BukkitRunnable implements ConnectionStora
     private ServerSocket server;
     private int port;
     private List<Connection> connections;
-    private List<Connection> authorized;
+    private Map<Connection, Client> authorized;
     private ClientsConfig config;
     private JavaPlugin plugin;
     private LocaleStorage locale;
@@ -42,7 +45,7 @@ public class ConnectionManager extends BukkitRunnable implements ConnectionStora
                             , JavaPlugin plugin
                             , LocaleStorage locale) {
         connections  = new ArrayList<>();
-        authorized   = new ArrayList<>();
+        authorized   = new HashMap<>();
         this.config  = config;
         this.port    = port;
         this.plugin  = plugin;
@@ -101,12 +104,12 @@ public class ConnectionManager extends BukkitRunnable implements ConnectionStora
     }
 
     @Override
-    public List<Connection> getAuthorized() {
+    public Map<Connection, Client> getAuthorized() {
         return this.authorized;
     }
 
     @Override
-    public void addAuthorized(Connection conn) {
-        this.authorized.add(conn);
+    public void addAuthorized(Connection conn, Client client) {
+        this.authorized.put(conn, client);
     }
 }
