@@ -1,0 +1,5 @@
+name: RemoteConsole
+main: me.nyanguymf.console.bukkit.ConsoleBukkit
+version: ${project.version}
+
+author: NyanGuyMF

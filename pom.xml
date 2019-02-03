@@ -1,0 +1,140 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>me.nyanguymf.java.bukkit.console</groupId>
+  <artifactId>console-server</artifactId>
+  <version>0.5.12-SNAPSHOT</version>
+  <name>Java Bukkit remote console</name>
+
+    <repositories>
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>maven-repository</id>
+            <url>file:///${project.basedir}/maven-repository</url>
+        </repository>
+
+        <!--===========-->
+        <!-- ConfigLib -->
+        <!--===========-->
+        <repository>
+            <id>de.exlll</id>
+            <url>http://exlll.de:8081/artifactory/releases/</url>
+        </repository>
+    </repositories>
+
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>io.bluecube.thunderbolt</groupId>
+            <artifactId>Thunderbolt</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.13.2-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
+        <!--===============================================-->
+        <!--  MD5 hash algorithm from Apache Common Codec  -->
+        <!--===============================================-->
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.3</version>
+        </dependency>
+
+        <!--===========-->
+        <!-- ConfigLib -->
+        <!--===========-->
+        <dependency>
+            <groupId>de.exlll</groupId>
+            <artifactId>configlib-bukkit</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources/</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <plugins>
+            <!--=======================================-->
+            <!--   Maven Shade plugin for executable   -->
+            <!--    file and including dependencies    -->
+            <!--=======================================-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals><goal>shade</goal></goals>
+                        <configuration>
+                            <artifactSet>
+                                <includes>
+                                    <include>de.exlll</include>
+                                    <include>commons-codec:commons-codec</include>
+                                    <include>io.bluecube.thunderbolt:*</include>
+                                </includes>
+                            </artifactSet>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--========================-->
+            <!-- Include resource files -->
+            <!--========================-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.1.0</version>
+            </plugin>
+            <!--=============================-->
+            <!-- Compile and include classes -->
+            <!--=============================-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <!--==============================================-->
+            <!--    Maven Jar plugin for manifest creation    -->
+            <!--==============================================-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>me.nyanguymf.console.server.ConsoleServer</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+</project>
