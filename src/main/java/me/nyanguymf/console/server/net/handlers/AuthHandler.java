@@ -14,7 +14,6 @@ import me.nyanguymf.console.net.Packet;
 import me.nyanguymf.console.net.PacketType;
 import me.nyanguymf.console.server.net.Connection;
 import me.nyanguymf.console.server.types.Authorizable;
-import me.nyanguymf.console.server.types.Client;
 import me.nyanguymf.console.server.types.ClientsConfig;
 import me.nyanguymf.console.server.types.ConnectionStorage;
 
@@ -39,7 +38,7 @@ public final class AuthHandler extends PacketHandler {
         String login    = packet.getSender();
         String password = packet.getBody();
 
-        Map<String, Client> clientsByName = config.getClients();
+        Map<String, Authorizable> clientsByName = config.getClients();
 
         if (!clientsByName.containsKey(login)) {
             authError("[AuthHandler] There are no such user for login: " + login + ".");
@@ -48,7 +47,7 @@ public final class AuthHandler extends PacketHandler {
 
         Authorizable client = clientsByName.get(login);
 
-        if (client.isAuthorized()) {
+        if (client.isAuthorized() && isCurrentSession(client.getLastIp())) {
             alreadyAuthorized();
             return;
         }
@@ -63,8 +62,14 @@ public final class AuthHandler extends PacketHandler {
             return;
         }
 
-        this.storage.addAuthorized(this.conn,(Client) client);
+        this.storage.addAuthorized(this.conn, client);
+        this.config.save();
         authSuccess();
+    }
+
+    /** Checks current Connection address and given. */
+    private boolean isCurrentSession(String ip) {
+        return ip.equals(this.conn.getAddress());
     }
 
     /*-----------------------------*

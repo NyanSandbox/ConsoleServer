@@ -26,6 +26,7 @@ public final class Connection {
     private OutputManager out;
     private InputManager in;
     private ConnectionStorage storage;
+    private ClientsConfig config;
 
     /**
      * Creates new I/O system from {@link Socket} connection.
@@ -45,6 +46,7 @@ public final class Connection {
 
         this.storage    = storage;
         this.connection = socket;
+        this.config     = config;
 
         this.out = new OutputManager(connection.getOutputStream());
         this.in  = new InputManager(connection.getInputStream(), out, plugin, this);
@@ -66,6 +68,7 @@ public final class Connection {
 
         /* Deauthorize current client on close. */
         this.storage.getAuthorized().get(this).deauthorize();
+        this.config.save();
 
         if (!this.in.isCancelled())
             this.in.cancel();
@@ -79,5 +82,10 @@ public final class Connection {
     /** Gets connection storage. */
     public ConnectionStorage getConnStorage() {
         return this.storage;
+    }
+
+    /** Gets client address. */
+    public String getAddress() {
+        return this.connection.getRemoteSocketAddress().toString();
     }
 }

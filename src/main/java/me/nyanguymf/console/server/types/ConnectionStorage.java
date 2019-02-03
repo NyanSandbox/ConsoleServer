@@ -21,8 +21,8 @@ import me.nyanguymf.console.server.net.handlers.AuthHandler;
  */
 public interface ConnectionStorage {
     /** Gets all authorized connections. */
-    public Map<Connection, Client> getAuthorized();
+    public Map<Connection, Authorizable> getAuthorized();
 
     /** Adds authorized connection. */
-    public void addAuthorized(Connection conn, Client client);
+    public void addAuthorized(Connection conn, Authorizable client);
 }

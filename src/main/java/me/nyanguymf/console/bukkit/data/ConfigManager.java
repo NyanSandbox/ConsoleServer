@@ -2,7 +2,7 @@
  * ConfigManager.java
  *
  * Copyright 2019.02.02 Vasiliy Petukhov
- * 
+ *
  * @version 1.0
  */
 package me.nyanguymf.console.bukkit.data;
@@ -27,14 +27,13 @@ public final class ConfigManager extends BukkitYamlConfiguration implements Clie
 
     @Comment("Registered clients")
     @ElementType(Client.class)
-    private Map<String, Client> clientsByName;
+    private Map<String, Authorizable> clientsByName;
 
     public ConfigManager(Path path, BukkitYamlProperties properties) {
         super(path, properties);
 
         this.maxAuthTries = 4; /* just default value. */
         clientsByName = new TreeMap<>();
-        clientsByName.put("NyanGuyMF", new Client("NyanGuyMF", "password", false));
     }
 
     @Override
@@ -49,7 +48,7 @@ public final class ConfigManager extends BukkitYamlConfiguration implements Clie
 
     @Override
     public Authorizable registerNewClient(String login, String password) {
-        Client client = new Client(login, password, false);
+        Client client = new Client(login, password, false, "");
 
         this.clientsByName.put(client.getLogin(), client);
 
@@ -65,7 +64,16 @@ public final class ConfigManager extends BukkitYamlConfiguration implements Clie
     }
 
     @Override
-    public Map<String, Client> getClients() {
+    public Map<String, Authorizable> getClients() {
         return clientsByName;
+    }
+
+    /* (non-Javadoc)
+     * @see me.nyanguymf.console.server.types.ClientsConfig#updateClient(me.nyanguymf.console.server.types.Authorizable)
+     */
+    @Override
+    public void updateClient(Authorizable client) {
+        // TODO Auto-generated method stub
+
     }
 }

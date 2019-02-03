@@ -35,4 +35,7 @@ public interface Authorizable {
 
     /** Gets hash code of password. */
     public String getPassHash();
+
+    /** Gets last IP of client. */
+    public String getLastIp();
 }

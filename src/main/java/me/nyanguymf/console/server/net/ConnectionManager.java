@@ -20,7 +20,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import me.nyanguymf.console.server.types.Client;
+import me.nyanguymf.console.server.types.Authorizable;
 import me.nyanguymf.console.server.types.ClientsConfig;
 import me.nyanguymf.console.server.types.ConnectionStorage;
 import me.nyanguymf.console.server.types.LocaleStorage;
@@ -32,7 +32,7 @@ public class ConnectionManager extends BukkitRunnable implements ConnectionStora
     private ServerSocket server;
     private int port;
     private List<Connection> connections;
-    private Map<Connection, Client> authorized;
+    private Map<Connection, Authorizable> authorized;
     private ClientsConfig config;
     private JavaPlugin plugin;
     private LocaleStorage locale;
@@ -54,9 +54,9 @@ public class ConnectionManager extends BukkitRunnable implements ConnectionStora
 
     @Override
     public void run() {
-        String       portError = locale.getString("port-bind-error", String.valueOf(port));
-        Socket       socket    = null;
-        String       connected;
+        String portError = locale.getString("port-bind-error", String.valueOf(port));
+        Socket socket    = null;
+        String connected;
 
         try {
             server = new ServerSocket(port);
@@ -104,12 +104,12 @@ public class ConnectionManager extends BukkitRunnable implements ConnectionStora
     }
 
     @Override
-    public Map<Connection, Client> getAuthorized() {
+    public Map<Connection, Authorizable> getAuthorized() {
         return this.authorized;
     }
 
     @Override
-    public void addAuthorized(Connection conn, Client client) {
+    public void addAuthorized(Connection conn, Authorizable client) {
         this.authorized.put(conn, client);
     }
 }

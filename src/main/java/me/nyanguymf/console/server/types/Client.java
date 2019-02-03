@@ -33,9 +33,13 @@ public final class Client implements Authorizable {
     @Comment("Tries of authorization.")
     private int authTries;
 
+    /** Last client's IP address. */
+    @Comment("Last client's IP address.")
+    private String lastIp;
+
     /* Don't use it! Just for ConfigLib. */
     public Client() {
-        this("", "", true);
+        this("", "", true, "");
     }
 
     /**
@@ -57,11 +61,12 @@ public final class Client implements Authorizable {
      * @param passHash : String value for {@link #passHash}.
      * @param isHashed : If <tt>false</tt> given password will not hashing.
      */
-    public Client(String login, String password, boolean isHashed) {
+    public Client(String login, String password, boolean isHashed, String lastIp) {
         this.login = login;
         this.passHash = isHashed ? password : DigestUtils.md5Hex(password);
         this.authTries = 0;
         this.isAuthorized = false;
+        this.lastIp = lastIp;
     }
 
     @Override
@@ -97,5 +102,10 @@ public final class Client implements Authorizable {
     public void deauthorize() {
         this.authTries = 0;
         this.isAuthorized = false;
+    }
+
+    @Override
+    public String getLastIp() {
+        return this.lastIp;
     }
 }
