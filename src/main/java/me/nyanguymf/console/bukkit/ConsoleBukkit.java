@@ -8,14 +8,18 @@
 package me.nyanguymf.console.bukkit;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import de.exlll.configlib.configs.yaml.BukkitYamlConfiguration;
 import de.exlll.configlib.configs.yaml.BukkitYamlConfiguration.BukkitYamlProperties;
 import me.nyanguymf.console.bukkit.data.ConfigManager;
+import me.nyanguymf.console.bukkit.listeners.ConsoleListener;
 import me.nyanguymf.console.server.net.ConnectionManager;
 import me.nyanguymf.console.server.types.ClientsConfig;
 import me.nyanguymf.console.server.types.LocaleStorage;
@@ -40,6 +44,17 @@ public class ConsoleBukkit extends JavaPlugin {
         initDefaultConfig();
         initClientsConfig();
         initConnManager();
+
+        /*---------------------------------*/
+        /* The last step of initialization */
+        /*---------------------------------*/
+        try {
+            ConsoleListener consoleListener = new ConsoleListener(connectionManager);
+            Logger logger = LogManager.getRootLogger();
+            ((org.apache.logging.log4j.core.Logger)logger).addFilter(consoleListener);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         Bukkit.getConsoleSender().sendMessage("§bPlugin enabled.");
     }

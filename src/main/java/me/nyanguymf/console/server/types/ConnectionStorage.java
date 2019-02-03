@@ -25,4 +25,10 @@ public interface ConnectionStorage {
 
     /** Adds authorized connection. */
     public void addAuthorized(Connection conn, Authorizable client);
+
+    /** Check is connected with anybody. */
+    public boolean isConnected();
+
+    /** Removes authorized connection. */
+    public void removeAuthorized(Connection conn);
 }

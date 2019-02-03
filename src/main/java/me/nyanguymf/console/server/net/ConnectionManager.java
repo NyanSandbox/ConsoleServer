@@ -112,4 +112,14 @@ public class ConnectionManager extends BukkitRunnable implements ConnectionStora
     public void addAuthorized(Connection conn, Authorizable client) {
         this.authorized.put(conn, client);
     }
+
+    @Override
+    public boolean isConnected() {
+        return !this.authorized.isEmpty();
+    }
+
+    @Override
+    public void removeAuthorized(Connection conn) {
+        this.authorized.remove(conn);
+    }
 }

@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.nyanguymf.java.bukkit.console</groupId>
   <artifactId>console-server</artifactId>
-  <version>0.5.16-SNAPSHOT</version>
+  <version>0.5.17-SNAPSHOT</version>
   <name>Java Bukkit remote console</name>
 
     <repositories>
@@ -31,11 +31,17 @@
 
     <dependencies>
 
+        <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
+        <!--===========================================-->
+        <!--  Logging to listen Bukkit console output  -->
+        <!--===========================================-->
         <dependency>
-            <groupId>io.bluecube.thunderbolt</groupId>
-            <artifactId>Thunderbolt</artifactId>
-            <version>1.0</version>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.11.1</version>
         </dependency>
+
+
 
         <dependency>
             <groupId>org.spigotmc</groupId>
@@ -90,9 +96,9 @@
                         <configuration>
                             <artifactSet>
                                 <includes>
+                                    <include>org.apache.logging.log4j:log4j-core</include>
                                     <include>de.exlll</include>
                                     <include>commons-codec:commons-codec</include>
-                                    <include>io.bluecube.thunderbolt:*</include>
                                 </includes>
                             </artifactSet>
                         </configuration>

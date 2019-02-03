@@ -69,6 +69,7 @@ public final class Connection {
         /* Deauthorize current client on close. */
         try {
             this.storage.getAuthorized().get(this).deauthorize();
+            this.storage.removeAuthorized(this);
         } catch (NullPointerException expected) {
             // In the case when client doesn't authorized yet.
         }
