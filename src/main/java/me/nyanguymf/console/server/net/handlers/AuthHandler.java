@@ -58,12 +58,22 @@ public final class AuthHandler extends PacketHandler {
         }
 
         if (!client.authorise(password)) {
+            /*---------------------*
+             * Update tries count. *
+             *---------------------*/
+            this.config.updateClient(client);
+            this.config.save();
+
             authError("[AuthHandler] Wrong password.");
             return;
         }
 
+        client.updateLastIp(this.conn.getAddress());
+
         this.storage.addAuthorized(this.conn, client);
+        this.config.updateClient(client);
         this.config.save();
+
         authSuccess();
     }
 

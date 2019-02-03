@@ -108,4 +108,12 @@ public final class Client implements Authorizable {
     public String getLastIp() {
         return this.lastIp;
     }
+
+    @Override
+    public String updateLastIp(String newIp) {
+        String buffer = this.lastIp;
+        this.lastIp = newIp;
+
+        return buffer;
+    }
 }

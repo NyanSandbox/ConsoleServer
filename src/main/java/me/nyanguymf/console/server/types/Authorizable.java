@@ -14,9 +14,9 @@ public interface Authorizable {
     /**
      * Authorizes some user with login in system.
      *
-     * @param login : User's login.
-     * @param password : User's password.
-     * @return <tt>true</tt> if authorized successfully
+     * @param   login       User's login.
+     * @param   password    User's password.
+     * @return  <tt>true</tt> if authorized successfully
      * and <tt>false</tt> if not.
      */
     public boolean authorise(String password);
@@ -38,4 +38,12 @@ public interface Authorizable {
 
     /** Gets last IP of client. */
     public String getLastIp();
+
+    /**
+     * Updates last IP address.
+     *
+     * @param   newIp   New IP address to update.
+     * @return Last IP address.
+     */
+    public String updateLastIp(String newIp);
 }

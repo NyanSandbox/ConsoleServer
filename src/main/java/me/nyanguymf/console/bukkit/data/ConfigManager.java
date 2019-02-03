@@ -68,12 +68,8 @@ public final class ConfigManager extends BukkitYamlConfiguration implements Clie
         return clientsByName;
     }
 
-    /* (non-Javadoc)
-     * @see me.nyanguymf.console.server.types.ClientsConfig#updateClient(me.nyanguymf.console.server.types.Authorizable)
-     */
     @Override
     public void updateClient(Authorizable client) {
-        // TODO Auto-generated method stub
-
+        this.clientsByName.put(client.getLogin(), client);
     }
 }
