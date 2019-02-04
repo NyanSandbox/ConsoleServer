@@ -12,13 +12,14 @@ import java.util.Observable;
 import java.util.Observer;
 
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import me.nyanguymf.console.net.Packet;
 import me.nyanguymf.console.net.PacketType;
 import me.nyanguymf.console.server.net.Connection;
 import me.nyanguymf.console.server.net.handlers.AuthHandler;
+import me.nyanguymf.console.server.net.handlers.CommandHandler;
 import me.nyanguymf.console.server.net.handlers.PacketHandler;
-import me.nyanguymf.console.server.types.ClientsConfig;
 import me.nyanguymf.console.server.types.RequestManager;
 
 /**
@@ -27,11 +28,14 @@ import me.nyanguymf.console.server.types.RequestManager;
 public final class ClientInputListener implements Observer {
     private RequestManager out;
     private PacketHandler auth;
+    private PacketHandler cmd;
 
-    public ClientInputListener(Connection currentConn, ClientsConfig config) {
-        this.out = currentConn.getRequestManager();
+    public ClientInputListener(Connection currentConn
+                                , JavaPlugin plugin) {
 
-        auth = new AuthHandler(currentConn, config);
+        this.out  = currentConn.getRequestManager();
+        this.auth = new AuthHandler(currentConn);
+        this.cmd  = new CommandHandler(currentConn, plugin);
     }
 
     @Override
@@ -46,7 +50,7 @@ public final class ClientInputListener implements Observer {
             Bukkit.getConsoleSender().sendMessage(inputPacket.toString());
             break;
         case COMMAND_PACKET:
-            Bukkit.getConsoleSender().sendMessage("Got command: " + inputPacket.getBody());
+            cmd.handle(inputPacket);
             break;
         case INVALID_PACKET_ERROR:
             System.err.printf("Client got invalid packet: %s\n"

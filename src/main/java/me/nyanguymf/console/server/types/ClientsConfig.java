@@ -24,7 +24,7 @@ public interface ClientsConfig {
      * "JANE_SmitH" - method will return for
      * login "jane_smith".
      *
-     * @param login : User's login in any case.
+     * @param   login   User's login in any case.
      * @return User's password hash code.
      */
     public String getPassHash(String login);
@@ -38,7 +38,7 @@ public interface ClientsConfig {
     /**
      * Deletes Client for given login.
      *
-     * @param login : Client's login to delete.
+     * @param   login   Client's login to delete.
      * @return Deleted Client or <tt>null</tt> if
      * Client doesn't existed.
      */
@@ -46,6 +46,16 @@ public interface ClientsConfig {
 
     /** Gets map with clients. */
     public Map<String, Authorizable> getClients();
+
+    /**
+     * Gets specific client.
+     * <p>
+     * Retrieve <tt>null</tt> if client doesn't exists.
+     *
+     * @param   login   Client's login.
+     * @return Authorizable client.
+     */
+    public Authorizable getClient(String login);
 
     /** Saves config. */
     public void save();

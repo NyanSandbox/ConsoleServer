@@ -72,4 +72,10 @@ public final class ConfigManager extends BukkitYamlConfiguration implements Clie
     public void updateClient(Authorizable client) {
         this.clientsByName.put(client.getLogin(), client);
     }
+
+    @Override
+    public Authorizable getClient(String login) {
+        return this.clientsByName.get(login);
+    }
+
 }

@@ -10,12 +10,15 @@ package me.nyanguymf.console.server.net.handlers;
 import java.io.IOException;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
+
 import me.nyanguymf.console.net.Packet;
 import me.nyanguymf.console.net.PacketType;
 import me.nyanguymf.console.server.net.Connection;
 import me.nyanguymf.console.server.types.Authorizable;
 import me.nyanguymf.console.server.types.ClientsConfig;
 import me.nyanguymf.console.server.types.ConnectionStorage;
+import me.nyanguymf.console.server.types.LocaleStorage;
 
 /**
  * @author nyanguymf
@@ -24,12 +27,14 @@ public final class AuthHandler extends PacketHandler {
     private ClientsConfig config;
     private ConnectionStorage storage;
     private Connection conn;
+    private LocaleStorage locale;
 
-    public AuthHandler(Connection currentConn, ClientsConfig config) {
+    public AuthHandler(Connection currentConn) {
         super(currentConn.getRequestManager());
 
-        this.conn = currentConn;
-        this.config = config;
+        this.conn    = currentConn;
+        this.locale  = currentConn.getLocale();
+        this.config  = currentConn.getClientsConfig();
         this.storage = currentConn.getConnStorage();
     }
 
@@ -74,6 +79,13 @@ public final class AuthHandler extends PacketHandler {
         this.config.updateClient(client);
         this.config.save();
 
+
+        Bukkit.getConsoleSender().sendMessage(
+                locale.getString(
+                    "client-authorized"
+                    , conn.getAddress()
+                    , client.getLogin()
+            ));
         authSuccess();
     }
 

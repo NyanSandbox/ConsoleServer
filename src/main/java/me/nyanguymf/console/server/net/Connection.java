@@ -26,7 +26,8 @@ public final class Connection {
     private OutputManager out;
     private InputManager in;
     private ConnectionStorage storage;
-    private ClientsConfig config;
+    private ClientsConfig clientsConfig;
+    private LocaleStorage locale;
 
     /**
      * Creates new I/O system from {@link Socket} connection.
@@ -41,19 +42,20 @@ public final class Connection {
     public Connection(final Socket socket
                     , ClientsConfig config
                     , JavaPlugin plugin
-                    , final LocaleStorage locale
+                    , LocaleStorage locale
                     , ConnectionStorage storage) throws IOException {
 
-        this.storage    = storage;
-        this.connection = socket;
-        this.config     = config;
+        this.locale        = locale;
+        this.storage       = storage;
+        this.connection    = socket;
+        this.clientsConfig = config;
 
         this.out = new OutputManager(connection.getOutputStream());
         this.in  = new InputManager(connection.getInputStream(), out, plugin, this);
 
         this.in.runTaskAsynchronously(plugin);
 
-        this.in.registerListener(new ClientInputListener(this, config));
+        this.in.registerListener(new ClientInputListener(this, plugin));
         this.out.askPassword();
     }
 
@@ -74,7 +76,7 @@ public final class Connection {
             // In the case when client doesn't authorized yet.
         }
 
-        this.config.save();
+        this.clientsConfig.save();
 
         if (!this.in.isCancelled())
             this.in.cancel();
@@ -85,9 +87,18 @@ public final class Connection {
         return this.out;
     }
 
+    /** Gets locale storage. */
+    public LocaleStorage getLocale() {
+        return this.locale;
+    }
+
     /** Gets connection storage. */
     public ConnectionStorage getConnStorage() {
         return this.storage;
+    }
+
+    public ClientsConfig getClientsConfig() {
+        return this.clientsConfig;
     }
 
     /** Gets client address. */
