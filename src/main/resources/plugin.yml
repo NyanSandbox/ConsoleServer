@@ -1,4 +1,4 @@
-name: RemoteConsole
+name: ConsoleServer
 main: nyanguymf.console.server.ConsoleServerPlugin
 version: ${project.version}
 
