@@ -23,11 +23,16 @@
  */
 package nyanguymf.console.server.io;
 
+import static org.bukkit.Bukkit.getConsoleSender;
+import static org.bukkit.ChatColor.YELLOW;
+
 import java.io.Closeable;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
+import java.net.SocketException;
 
 import nyanguymf.console.common.net.Packet;
 import nyanguymf.console.server.net.ClientConnection;
@@ -38,16 +43,24 @@ public final class ClientInputManager extends Thread implements Closeable {
     private InputStream clientInputStream;
     private ObjectInputStream in;
 
-    public ClientInputManager(final ClientConnection conn, final InputStream inputStream) {
+    public ClientInputManager(final ClientConnection conn) {
+        super("Input listener of " + conn.getClient().getRemoteSocketAddress());
         this.conn = conn;
-        clientInputStream = inputStream;
+        try {
+            clientInputStream = conn.getClient().getInputStream();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override public void run() {
         try {
             in = new ObjectInputStream(clientInputStream);
-        } catch (IOException ex) {
-            System.err.println("Unable to establish input connection with client.");
+        } catch (Exception ex) {
+            System.err.println(
+                "Unable to establish input connection with client: "
+                + ex.getLocalizedMessage()
+            );
             return;
         }
 
@@ -55,7 +68,23 @@ public final class ClientInputManager extends Thread implements Closeable {
 
         while (!currentThread().isInterrupted()) {
             try {
-                obj = in.readObject();
+                try {
+                    obj = in.readObject();
+                } catch (EOFException ex) {
+                    getConsoleSender().sendMessage(
+                        YELLOW + "Client " + conn.getClient().getRemoteSocketAddress()
+                        + " disconnected."
+                    );
+                    conn.close();
+                    break;
+                } catch (SocketException e) {
+                    getConsoleSender().sendMessage(
+                        YELLOW + "Client " + conn.getClient().getRemoteSocketAddress()
+                        + " disconnected."
+                    );
+                    conn.close();
+                    break;
+                }
 
                 if (!(obj instanceof Packet)) {
                     System.err.println("Got invalid packet from client.");
@@ -63,7 +92,7 @@ public final class ClientInputManager extends Thread implements Closeable {
                 }
 
                 Packet packet = (Packet) obj;
-                new Thread(() -> new ClientPacketEvent(conn, packet).run(),
+                new Thread(new ClientPacketEvent(conn, packet),
                     "Handle server packet thread."
                 ).start();
 

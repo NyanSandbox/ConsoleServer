@@ -32,7 +32,7 @@ public final class NetConfiguration extends BukkitYamlConfiguration {
     private int port = 2255;
 
     public NetConfiguration(final File pluginFolder) {
-        super(pluginFolder.toPath());
+        super(new File(pluginFolder, "net.yml").toPath());
     }
 
     /** @return the port */

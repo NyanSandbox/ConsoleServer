@@ -43,33 +43,12 @@ public final class ConsoleServerPlugin extends JavaPlugin {
 
     /** Load configuration and sockets as soon as it possible. */
     @Override public void onLoad() {
-        File netConfigFile  = new File(super.getDataFolder(), "net.yml");
-        File userConfigFile = new File(super.getDataFolder(), "user.yml");
+        loadConfiguration();
 
-        if (!userConfigFile.exists()) {
-            try {
-                userConfigFile.createNewFile();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                System.err.println("Unable to create user file. May cause NPEs");
-                return;
-            }
-        }
-        if (!netConfigFile.exists()) {
-            try {
-                netConfigFile.createNewFile();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                System.err.println("Unable to create net file. May cause NPEs");
-                return;
-            }
-        }
-
-        ConsoleServerPlugin.userConfig        = new UserConfiguration(super.getDataFolder());
-        ConsoleServerPlugin.netConfig         = new NetConfiguration(super.getDataFolder());
-        ConsoleServerPlugin.commandManager    = new CommandManager();
-        ConsoleServerPlugin.connectionManager = new ConnectionManager();
+        ConsoleServerPlugin.commandManager = new CommandManager();
         ConsoleServerPlugin.commandManager.registerCommand(new StopCommand());
+
+        ConsoleServerPlugin.connectionManager = new ConnectionManager().start();
     }
 
     @Override public void onEnable() {
@@ -97,5 +76,48 @@ public final class ConsoleServerPlugin extends JavaPlugin {
 
     public static NetConfiguration getNetConfig() {
         return ConsoleServerPlugin.netConfig;
+    }
+
+    private void loadConfiguration() {
+        if (!super.getDataFolder().exists()) {
+            super.getDataFolder().mkdir();
+        }
+
+        File netConfigFile  = new File(super.getDataFolder(), "net.yml");
+        File userConfigFile = new File(super.getDataFolder(), "user.yml");
+        boolean netFileExists = netConfigFile.exists();
+        boolean userFileExists = userConfigFile.exists();
+
+        if (!netFileExists) {
+            try {
+                netConfigFile.createNewFile();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                System.err.println("Unable to create net file. May cause NPEs");
+                return;
+            }
+        }
+        if (!userFileExists) {
+            try {
+                userConfigFile.createNewFile();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                System.err.println("Unable to create user file. May cause NPEs");
+                return;
+            }
+        }
+
+        ConsoleServerPlugin.netConfig = new NetConfiguration(super.getDataFolder());
+        ConsoleServerPlugin.userConfig = new UserConfiguration(super.getDataFolder());
+
+        if (!netFileExists) {
+            ConsoleServerPlugin.netConfig.save();
+        }
+        if (!userFileExists) {
+            ConsoleServerPlugin.userConfig.save();
+        }
+
+        ConsoleServerPlugin.userConfig.loadAndSave();
+        ConsoleServerPlugin.netConfig.loadAndSave();
     }
 }

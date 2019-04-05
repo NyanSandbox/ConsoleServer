@@ -23,19 +23,32 @@
  */
 package nyanguymf.console.server.net;
 
+import static org.bukkit.Bukkit.getConsoleSender;
+import static org.bukkit.ChatColor.YELLOW;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.Socket;
 
 import nyanguymf.console.server.io.ClientInputManager;
+import nyanguymf.console.server.io.ClientOutputManager;
 
 /** @author NyanGuyMF - Vasiliy Bely */
 public final class ClientConnection implements Closeable {
     private ClientInputManager inputManager;
+    private ClientOutputManager outputManager;
     private Socket client;
 
     public ClientConnection(final Socket socket) {
         client = socket;
+        try {
+            outputManager = new ClientOutputManager(client.getOutputStream());
+            inputManager = new ClientInputManager(this);
+
+            inputManager.start();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     /** @return the client */
@@ -54,11 +67,20 @@ public final class ClientConnection implements Closeable {
     }
 
     /** Sets inputManager */
-    public void setInputManager(final ClientInputManager inputManager) {
+    protected void setInputManager(final ClientInputManager inputManager) {
         this.inputManager = inputManager;
     }
 
+    /** @return the outputManager */
+    public ClientOutputManager getOutputManager() {
+        return outputManager;
+    }
+
     @Override public void close() throws IOException {
+        getConsoleSender().sendMessage(
+            YELLOW + "Closed connection with " + client.getRemoteSocketAddress()
+        );
+
         inputManager.close();
         client.close();
     }

@@ -60,6 +60,7 @@ public final class ConnectionsCache implements Closeable {
             try {
                 conn.close();
             } catch (IOException expected) {}
+            catch (NullPointerException expected) {}
         });
         cache.clear();
     }

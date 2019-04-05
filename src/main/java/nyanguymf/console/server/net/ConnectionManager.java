@@ -24,18 +24,17 @@
 package nyanguymf.console.server.net;
 
 import static nyanguymf.console.server.ConsoleServerPlugin.getNetConfig;
+import static org.bukkit.Bukkit.getConsoleSender;
+import static org.bukkit.ChatColor.GREEN;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 
 import nyanguymf.console.server.storage.cache.ConnectionsCache;
 
 /** @author NyanGuyMF - Vasiliy Bely */
-public final class ConnectionManager implements Closeable {
-    private static final int TEM_MINUTES_IN_MILLIS = 600_000;
+public final class ConnectionManager {
     private ConnectionsCache cache;
     private ServerSocket serverSocket;
 
@@ -49,6 +48,10 @@ public final class ConnectionManager implements Closeable {
             );
             return;
         }
+
+        getConsoleSender().sendMessage(
+            GREEN + "Start listening port " + serverSocket.getLocalPort()
+        );
 
         cache = new ConnectionsCache();
     }
@@ -68,25 +71,15 @@ public final class ConnectionManager implements Closeable {
                         "Unable to establish new connection: "
                         + ex.getLocalizedMessage()
                     );
-                    continue;
+                    break;
                 }
 
-                new Thread(() -> {
-                    try {
-                        newClient.setSoTimeout(ConnectionManager.TEM_MINUTES_IN_MILLIS);
-                    } catch (SocketException e) {
-                        try {
-                            newClient.close();
-                        } catch (IOException ignore) {
-                            // already closed
-                        }
-                        System.err.println(
-                            "Unable to set timeout for "
-                            + newClient.getRemoteSocketAddress()
-                        );
-                        return;
-                    }
+                getConsoleSender().sendMessage(
+                    GREEN + "Establish connection with "
+                    + newClient.getRemoteSocketAddress()
+                );
 
+                new Thread(() -> {
                     cache.addConnection(new ClientConnection(newClient));
                 }, "Socket " + newClient.getRemoteSocketAddress()).start();
             }
@@ -95,7 +88,7 @@ public final class ConnectionManager implements Closeable {
         return this;
     }
 
-    @Override public void close() throws IOException {
+    public void close() throws IOException {
         cache.close();
         serverSocket.close();
     }

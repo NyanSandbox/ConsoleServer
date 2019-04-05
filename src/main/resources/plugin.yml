@@ -1,5 +1,5 @@
 name: RemoteConsole
-main: me.nyanguymf.console.bukkit.ConsoleBukkit
+main: nyanguymf.console.server.ConsoleServerPlugin
 version: ${project.version}
 
 author: NyanGuyMF

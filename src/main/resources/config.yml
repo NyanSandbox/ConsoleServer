@@ -1,3 +1,0 @@
-version: ${project.version}
-connection:
-  port: 6666

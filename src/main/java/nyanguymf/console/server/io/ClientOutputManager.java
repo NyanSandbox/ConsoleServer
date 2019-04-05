@@ -1,5 +1,5 @@
 /**
- * This file is the part of Console Server plug-in.
+ * This file is the part of Console Client program.
  *
  * Copyright (c) 2019 Vasily
  *
@@ -21,22 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package nyanguymf.console.server.commands;
+package nyanguymf.console.server.io;
 
-import org.bukkit.Bukkit;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 
-import nyanguymf.console.common.command.ConsoleCommand;
-import nyanguymf.console.common.command.ConsoleCommandExecutor;
+import nyanguymf.console.common.net.Packet;
 
 /** @author NyanGuyMF - Vasiliy Bely */
-public final class StopCommand extends ConsoleCommand implements ConsoleCommandExecutor {
-    public StopCommand() {
-        super("stop");
-        super.setExecutor(this);
+public final class ClientOutputManager {
+    private ObjectOutputStream out;
+
+    public ClientOutputManager(final OutputStream out) throws IOException {
+        this.out = new ObjectOutputStream(out);
     }
 
-    @Override
-    public void execute(final ConsoleCommand cmd, final String alias, final String[] args) {
-        Bukkit.getServer().shutdown();
+    public boolean sendPacket(final Packet packet) {
+        try {
+            out.writeObject(packet);
+            out.flush();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
+    public void close() {
+        try {
+            out.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (NullPointerException ignore) {}
     }
 }

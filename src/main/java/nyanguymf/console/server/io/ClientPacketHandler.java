@@ -23,18 +23,26 @@
  */
 package nyanguymf.console.server.io;
 
-import static nyanguymf.console.server.storage.yaml.User.hasPermission;
+import static nyanguymf.console.server.ConsoleServerPlugin.getCommandManager;
+import static nyanguymf.console.server.storage.User.hasPermission;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import nyanguymf.console.common.event.DefaultHander;
 import nyanguymf.console.common.net.Packet;
-import nyanguymf.console.server.ConsoleServerPlugin;
-import nyanguymf.console.server.storage.yaml.User;
+import nyanguymf.console.common.net.PacketType;
+import nyanguymf.console.server.net.ClientConnection;
+import nyanguymf.console.server.storage.User;
 
 /** @author NyanGuyMF - Vasiliy Bely */
 final class ClientPacketHandler implements DefaultHander<ClientPacketEvent> {
+    private ClientConnection conn;
+
+    public ClientPacketHandler(final ClientConnection conn) {
+        this.conn = conn;
+    }
+
     @Override public void handle(final ClientPacketEvent event) {
         Packet packet = event.getPacket();
 
@@ -43,7 +51,6 @@ final class ClientPacketHandler implements DefaultHander<ClientPacketEvent> {
             System.out.println(packet.getBody());
             break;
         case STOP:
-            // check permissions
             User user;
 
             try {
@@ -54,7 +61,28 @@ final class ClientPacketHandler implements DefaultHander<ClientPacketEvent> {
             }
 
             if (hasPermission(user)) {
-                ConsoleServerPlugin.getCommandManager().executeCommand("stop", new String[0]);
+                conn.getOutputManager().sendPacket(
+                    new Packet.PacketBuilder()
+                        .body("Server stopped.")
+                        .type(PacketType.INFO)
+                        .build()
+                );
+                System.out.println(
+                    "Client " + conn.getClient().getRemoteSocketAddress()
+                    + " issued stop command."
+                );
+                getCommandManager().executeCommand("stop", new String[0]);
+            } else {
+                System.out.println(
+                    "Client " + conn.getClient().getRemoteSocketAddress()
+                    + " use wrong password or username."
+                );
+                conn.getOutputManager().sendPacket(
+                    new Packet.PacketBuilder()
+                        .body("Wrong password or login.")
+                        .type(PacketType.INFO)
+                        .build()
+                );
             }
             break;
 

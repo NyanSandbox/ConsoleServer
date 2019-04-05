@@ -21,15 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package nyanguymf.console.server.storage.yaml;
+package nyanguymf.console.server.storage;
 
 import static nyanguymf.console.server.ConsoleServerPlugin.getUserConfig;
 import static org.apache.commons.codec.digest.DigestUtils.md5Hex;
 
-import de.exlll.configlib.annotation.ConfigurationElement;
-
 /** @author NyanGuyMF - Vasiliy Bely */
-@ConfigurationElement
 public final class User {
     private String username;
 

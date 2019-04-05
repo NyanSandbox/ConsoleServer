@@ -33,7 +33,7 @@ public final class UserConfiguration extends BukkitYamlConfiguration {
     private String password = "6I|mO|z2R2#IeGeM";
 
     public UserConfiguration(final File pluginFolder) {
-        super(pluginFolder.toPath());
+        super(new File(pluginFolder, "user.yml").toPath());
     }
 
     /** @return the username */
@@ -42,7 +42,7 @@ public final class UserConfiguration extends BukkitYamlConfiguration {
     }
 
     /** Sets username */
-    public void setUsername(String username) {
+    public void setUsername(final String username) {
         this.username = username;
     }
 
@@ -52,7 +52,7 @@ public final class UserConfiguration extends BukkitYamlConfiguration {
     }
 
     /** Sets password */
-    public void setPassword(String password) {
+    public void setPassword(final String password) {
         this.password = password;
     }
 }

@@ -44,9 +44,9 @@ public final class ClientPacketEvent implements Event<ClientPacketEvent> {
             ClientPacketEvent.listeners = new HashSet<>();
         }
         if (ClientPacketEvent.defaultHander == null) {
-            ClientPacketEvent.defaultHander = new ClientPacketHandler();
+            ClientPacketEvent.defaultHander = new ClientPacketHandler(conn);
         } else if (!(ClientPacketEvent.defaultHander instanceof ClientPacketHandler)) {
-            ClientPacketEvent.defaultHander = new ClientPacketHandler();
+            ClientPacketEvent.defaultHander = new ClientPacketHandler(conn);
         }
 
         this.conn   = conn;
@@ -70,6 +70,6 @@ public final class ClientPacketEvent implements Event<ClientPacketEvent> {
 
     @Override public synchronized void run() {
         ClientPacketEvent.listeners.forEach(listener -> listener.onUpdate(this));
-
+        ClientPacketEvent.defaultHander.handle(this);
     }
 }
