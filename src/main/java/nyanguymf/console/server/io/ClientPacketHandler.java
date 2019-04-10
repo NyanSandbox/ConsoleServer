@@ -23,8 +23,13 @@
  */
 package nyanguymf.console.server.io;
 
-import static nyanguymf.console.server.ConsoleServerPlugin.getCommandManager;
-import static nyanguymf.console.server.storage.User.hasPermission;
+import static nyanguymf.console.server.ConsoleServerPlugin.runTask;
+import static nyanguymf.console.server.storage.CommandJson.hasPermission;
+import static org.bukkit.Bukkit.dispatchCommand;
+import static org.bukkit.Bukkit.getConsoleSender;
+import static org.bukkit.ChatColor.GREEN;
+import static org.bukkit.ChatColor.RED;
+import static org.bukkit.ChatColor.YELLOW;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -33,62 +38,109 @@ import nyanguymf.console.common.event.DefaultHander;
 import nyanguymf.console.common.net.Packet;
 import nyanguymf.console.common.net.PacketType;
 import nyanguymf.console.server.net.ClientConnection;
-import nyanguymf.console.server.storage.User;
+import nyanguymf.console.server.storage.AuthJson;
+import nyanguymf.console.server.storage.CommandJson;
+import nyanguymf.console.server.storage.Permissionable;
 
 /** @author NyanGuyMF - Vasiliy Bely */
 final class ClientPacketHandler implements DefaultHander<ClientPacketEvent> {
-    private ClientConnection conn;
 
-    public ClientPacketHandler(final ClientConnection conn) {
-        this.conn = conn;
-    }
-
-    @Override public void handle(final ClientPacketEvent event) {
+    @Override public void handle(final ClientPacketEvent event, final ClientConnection conn) {
         Packet packet = event.getPacket();
+        AuthJson auth;
 
         switch (packet.getType()) {
         case INFO:
             System.out.println(packet.getBody());
             break;
-        case STOP:
-            User user;
+        case REMOTE_COMMAND:
+            CommandJson command;
 
             try {
-                user = new Gson().fromJson(packet.getBody(), User.class);
+                command = new Gson().fromJson(packet.getBody(), CommandJson.class);
             } catch (JsonSyntaxException ex) {
                 System.err.println("Invalid JSON format: " + ex.getLocalizedMessage());
                 break;
             }
 
-            if (hasPermission(user)) {
-                conn.getOutputManager().sendPacket(
-                    new Packet.PacketBuilder()
-                        .body("Server stopped.")
-                        .type(PacketType.INFO)
-                        .build()
-                );
-                System.out.println(
-                    "Client " + conn.getClient().getRemoteSocketAddress()
-                    + " issued stop command."
-                );
-                getCommandManager().executeCommand("stop", new String[0]);
-            } else {
-                System.out.println(
-                    "Client " + conn.getClient().getRemoteSocketAddress()
-                    + " use wrong password or username."
-                );
-                conn.getOutputManager().sendPacket(
-                    new Packet.PacketBuilder()
-                        .body("Wrong password or login.")
-                        .type(PacketType.INFO)
-                        .build()
-                );
+            executeCommand(command, conn);
+            break;
+        case LOG_ENABLE:
+            try {
+                auth = new Gson().fromJson(packet.getBody(), AuthJson.class);
+            } catch (JsonSyntaxException ex) {
+                System.err.println("Invalid JSON format: " + ex.getLocalizedMessage());
+                break;
             }
+
+            toggleLog(auth, true, conn);
+            break;
+        case LOG_DISABLE:
+            try {
+                auth = new Gson().fromJson(packet.getBody(), AuthJson.class);
+            } catch (JsonSyntaxException ex) {
+                System.err.println("Invalid JSON format: " + ex.getLocalizedMessage());
+                break;
+            }
+
+            toggleLog(auth, false, conn);
             break;
 
         default:
             System.err.println("Unknown packet: " + packet);
             break;
         }
+    }
+
+    private void toggleLog(
+        final AuthJson auth, final boolean logStatus
+        , final ClientConnection conn
+    ) {
+        if (!checkPermission(auth, conn))
+            return;
+
+        String status = logStatus
+                ? GREEN + "true"
+                : RED + "false";
+
+        conn.setLoggable(logStatus);
+        getConsoleSender().sendMessage(
+            YELLOW + "Client " + conn.getClient().getRemoteSocketAddress()
+            + " changed loggable status to " + status
+        );
+    }
+
+    private void executeCommand(final CommandJson command, final ClientConnection conn) {
+        if (!checkPermission(command, conn))
+            return;
+
+        runTask(() -> {
+            dispatchCommand(
+                getConsoleSender(),
+                command.getCommand() + " " + command.getArgs()
+            );
+        });
+    }
+
+    private boolean checkPermission(
+        final Permissionable permissionable
+        , final ClientConnection conn
+    ) {
+        if (hasPermission(permissionable))
+            return true;
+
+        System.out.printf(
+            "Client %s use wrong password/username.\n",
+            conn.getClient().getRemoteSocketAddress()
+        );
+
+        conn.getOutputManager().sendPacket(
+                new Packet.PacketBuilder()
+                .body("Wrong password or login.")
+                .type(PacketType.INFO)
+                .build()
+        );
+
+        return false;
     }
 }

@@ -21,22 +21,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package nyanguymf.console.server.commands;
-
-import org.bukkit.Bukkit;
-
-import nyanguymf.console.common.command.ConsoleCommand;
-import nyanguymf.console.common.command.ConsoleCommandExecutor;
+package nyanguymf.console.server.storage;
 
 /** @author NyanGuyMF - Vasiliy Bely */
-public final class StopCommand extends ConsoleCommand implements ConsoleCommandExecutor {
-    public StopCommand() {
-        super("stop");
-        super.setExecutor(this);
+public final class AuthJson implements Permissionable {
+    private String username;
+
+    private String hashedPassword;
+
+    /** @return the username */
+    @Override public String getUsername() {
+        return username;
     }
 
-    @Override
-    public void execute(final ConsoleCommand cmd, final String alias, final String[] args) {
-        Bukkit.getServer().shutdown();
+    /** @return the hashedPassword */
+    @Override public String getHashedPassword() {
+        return hashedPassword;
+    }
+
+    /** Sets username */
+    protected void setUsername(final String username) {
+        this.username = username;
+    }
+
+    /** Sets hashedPassword */
+    protected void setHashedPassword(final String hashedPassword) {
+        this.hashedPassword = hashedPassword;
     }
 }

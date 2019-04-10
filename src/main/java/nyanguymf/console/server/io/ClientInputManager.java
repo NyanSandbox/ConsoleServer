@@ -23,6 +23,7 @@
  */
 package nyanguymf.console.server.io;
 
+import static nyanguymf.console.server.ConsoleServerPlugin.getConnectionsCache;
 import static org.bukkit.Bukkit.getConsoleSender;
 import static org.bukkit.ChatColor.YELLOW;
 
@@ -36,16 +37,21 @@ import java.net.SocketException;
 
 import nyanguymf.console.common.net.Packet;
 import nyanguymf.console.server.net.ClientConnection;
+import nyanguymf.console.server.storage.cache.ConnectionsCache;
 
 /** @author NyanGuyMF - Vasiliy Bely */
 public final class ClientInputManager extends Thread implements Closeable {
+    private ConnectionsCache cache;
     private ClientConnection conn;
     private InputStream clientInputStream;
     private ObjectInputStream in;
 
     public ClientInputManager(final ClientConnection conn) {
         super("Input listener of " + conn.getClient().getRemoteSocketAddress());
+
         this.conn = conn;
+        cache = getConnectionsCache();
+
         try {
             clientInputStream = conn.getClient().getInputStream();
         } catch (IOException ex) {
@@ -75,6 +81,7 @@ public final class ClientInputManager extends Thread implements Closeable {
                         YELLOW + "Client " + conn.getClient().getRemoteSocketAddress()
                         + " disconnected."
                     );
+                    cache.removeSocket(conn.getClient());
                     conn.close();
                     break;
                 } catch (SocketException e) {
@@ -82,6 +89,7 @@ public final class ClientInputManager extends Thread implements Closeable {
                         YELLOW + "Client " + conn.getClient().getRemoteSocketAddress()
                         + " disconnected."
                     );
+                    cache.removeSocket(conn.getClient());
                     conn.close();
                     break;
                 }

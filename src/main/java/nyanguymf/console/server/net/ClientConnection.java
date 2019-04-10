@@ -29,6 +29,7 @@ import static org.bukkit.ChatColor.YELLOW;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Objects;
 
 import nyanguymf.console.server.io.ClientInputManager;
 import nyanguymf.console.server.io.ClientOutputManager;
@@ -38,6 +39,7 @@ public final class ClientConnection implements Closeable {
     private ClientInputManager inputManager;
     private ClientOutputManager outputManager;
     private Socket client;
+    private boolean isLoggable = false;
 
     public ClientConnection(final Socket socket) {
         client = socket;
@@ -76,6 +78,16 @@ public final class ClientConnection implements Closeable {
         return outputManager;
     }
 
+    /** @return the isLoggable */
+    public boolean isLoggable() {
+        return isLoggable;
+    }
+
+    /** Sets isLoggable */
+    public void setLoggable(final boolean isLoggable) {
+        this.isLoggable = isLoggable;
+    }
+
     @Override public void close() throws IOException {
         getConsoleSender().sendMessage(
             YELLOW + "Closed connection with " + client.getRemoteSocketAddress()
@@ -83,5 +95,27 @@ public final class ClientConnection implements Closeable {
 
         inputManager.close();
         client.close();
+    }
+
+    @Override public int hashCode() {
+        return Objects.hash(client.getRemoteSocketAddress().toString());
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+
+        if (obj == null)
+            return false;
+
+        if (!(obj instanceof ClientConnection))
+            return false;
+
+        ClientConnection other = (ClientConnection) obj;
+        return Objects.equals(
+            client.getRemoteSocketAddress().toString(),
+            other.client.getRemoteSocketAddress().toString()
+        );
     }
 }

@@ -92,4 +92,8 @@ public final class ConnectionManager {
         cache.close();
         serverSocket.close();
     }
+
+    public ConnectionsCache getCache() {
+        return cache;
+    }
 }

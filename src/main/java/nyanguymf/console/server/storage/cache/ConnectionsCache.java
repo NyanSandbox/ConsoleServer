@@ -26,6 +26,7 @@ package nyanguymf.console.server.storage.cache;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +38,10 @@ public final class ConnectionsCache implements Closeable {
 
     public ConnectionsCache() {
         cache = new HashMap<>();
+    }
+
+    public synchronized Collection<ClientConnection> getConnections() {
+        return cache.values();
     }
 
     public synchronized ClientConnection getCachedConnection(final String address) {

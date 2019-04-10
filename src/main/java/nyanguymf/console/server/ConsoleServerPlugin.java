@@ -23,41 +23,54 @@
  */
 package nyanguymf.console.server;
 
+import static org.apache.logging.log4j.LogManager.getRootLogger;
+import static org.bukkit.Bukkit.getScheduler;
+
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.logging.log4j.Logger;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 
-import nyanguymf.console.common.command.CommandManager;
-import nyanguymf.console.server.commands.StopCommand;
+import nyanguymf.console.server.log.ConsoleLogger;
 import nyanguymf.console.server.net.ConnectionManager;
+import nyanguymf.console.server.storage.cache.ConnectionsCache;
 import nyanguymf.console.server.storage.yaml.NetConfiguration;
 import nyanguymf.console.server.storage.yaml.UserConfiguration;
 
 /** @author NyanGuyMF - Vasiliy Bely */
 public final class ConsoleServerPlugin extends JavaPlugin {
+    private static Plugin plugin;
     private static UserConfiguration userConfig;
     private static NetConfiguration netConfig;
-    private static CommandManager commandManager;
-    private static ConnectionManager connectionManager;
+    private static ConnectionsCache connectionsCache;
+    private ConnectionManager connectionManager;
+
+    public ConsoleServerPlugin() {
+        ConsoleServerPlugin.plugin = this;
+    }
 
     /** Load configuration and sockets as soon as it possible. */
     @Override public void onLoad() {
         loadConfiguration();
 
-        ConsoleServerPlugin.commandManager = new CommandManager();
-        ConsoleServerPlugin.commandManager.registerCommand(new StopCommand());
-
-        ConsoleServerPlugin.connectionManager = new ConnectionManager().start();
+        connectionManager = new ConnectionManager().start();
+        ConsoleServerPlugin.connectionsCache = connectionManager.getCache();
     }
 
     @Override public void onEnable() {
+        ConsoleLogger consoleListener = new ConsoleLogger(connectionManager);
+        Logger logger = getRootLogger();
+        ((org.apache.logging.log4j.core.Logger)logger).addFilter(consoleListener);
+
         super.getLogger().info("Plugin enabled.");
     }
 
     @Override public void onDisable() {
         try {
-            ConsoleServerPlugin.connectionManager.close();
+            connectionManager.close();
         } catch (IOException ex) {
             System.err.println(
                 "Unable to close all connections: "
@@ -66,16 +79,21 @@ public final class ConsoleServerPlugin extends JavaPlugin {
         }
     }
 
+    public static BukkitTask runTask(final Runnable task) {
+        return getScheduler().runTask(ConsoleServerPlugin.plugin, task);
+    }
+
     public static UserConfiguration getUserConfig() {
         return ConsoleServerPlugin.userConfig;
     }
 
-    public static CommandManager getCommandManager() {
-        return ConsoleServerPlugin.commandManager;
-    }
-
     public static NetConfiguration getNetConfig() {
         return ConsoleServerPlugin.netConfig;
+    }
+
+    /** @return the connectionsCache */
+    public static ConnectionsCache getConnectionsCache() {
+        return ConsoleServerPlugin.connectionsCache;
     }
 
     private void loadConfiguration() {

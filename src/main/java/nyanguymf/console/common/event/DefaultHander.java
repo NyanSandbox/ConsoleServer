@@ -23,6 +23,8 @@
  */
 package nyanguymf.console.common.event;
 
+import nyanguymf.console.server.net.ClientConnection;
+
 /**
  * Provides default handling for specific {@link Event}
  * implementation.
@@ -32,5 +34,5 @@ package nyanguymf.console.common.event;
 @FunctionalInterface
 public interface DefaultHander<Impl extends Event<?>> {
     /** Runs after all event listeners and handles the event by default. */
-    void handle(Impl event);
+    void handle(Impl event, final ClientConnection conn);
 }

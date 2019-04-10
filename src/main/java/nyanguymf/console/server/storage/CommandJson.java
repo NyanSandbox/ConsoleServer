@@ -27,18 +27,22 @@ import static nyanguymf.console.server.ConsoleServerPlugin.getUserConfig;
 import static org.apache.commons.codec.digest.DigestUtils.md5Hex;
 
 /** @author NyanGuyMF - Vasiliy Bely */
-public final class User {
+public final class CommandJson implements Permissionable {
+    private String command;
+
+    private String args;
+
     private String username;
 
     private String hashedPassword;
 
-    public static boolean hasPermission(final User user) {
-        return user.getHashedPassword().equals(md5Hex(getUserConfig().getPassword()))
-                && user.getUsername().equals(getUserConfig().getUsername());
+    public static boolean hasPermission(final Permissionable client) {
+        return client.getHashedPassword().equals(md5Hex(getUserConfig().getPassword()))
+                && client.getUsername().equals(getUserConfig().getUsername());
     }
 
     /** @return the username */
-    public String getUsername() {
+    @Override public String getUsername() {
         return username;
     }
 
@@ -48,12 +52,32 @@ public final class User {
     }
 
     /** @return the hashedPassword */
-    public String getHashedPassword() {
+    @Override public String getHashedPassword() {
         return hashedPassword;
     }
 
     /** Sets hashedPassword */
     public void setHashedPassword(final String password) {
         hashedPassword = password;
+    }
+
+    /** @return the command */
+    public String getCommand() {
+        return command;
+    }
+
+    /** Sets command */
+    public void setCommand(final String command) {
+        this.command = command;
+    }
+
+    /** @return the args */
+    public String getArgs() {
+        return args;
+    }
+
+    /** Sets args */
+    public void setArgs(final String args) {
+        this.args = args;
     }
 }

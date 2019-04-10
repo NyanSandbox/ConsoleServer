@@ -31,6 +31,4 @@ package nyanguymf.console.common.event;
 public interface Event<Impl extends Event<?>> extends Runnable {
     /** Registers listener for this event. */
     void register(EventListener<Impl> listener);
-    /** Fires event to run. */
-    @Override void run();
 }

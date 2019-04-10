@@ -1,5 +1,5 @@
 /**
- * This file is the part of Console Client program.
+ * This file is the part of Console Server plug-in.
  *
  * Copyright (c) 2019 Vasily
  *
@@ -21,9 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-/**
- * Provides basic commands management.
- *
- * @author NyanGuyMF - Vasiliy Bely
- */
-package nyanguymf.console.common.command;
+package nyanguymf.console.server.storage;
+
+/** @author NyanGuyMF - Vasiliy Bely */
+public interface Permissionable {
+    String getUsername();
+    String getHashedPassword();
+}

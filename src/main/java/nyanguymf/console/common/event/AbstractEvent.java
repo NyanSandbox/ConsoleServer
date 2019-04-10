@@ -31,9 +31,8 @@ import java.util.Set;
  *
  * @author NyanGuyMF - Vasiliy Bely
  */
-public class AbstractEvent<Impl extends AbstractEvent<?>> implements Event<Impl> {
+public abstract class AbstractEvent<Impl extends AbstractEvent<?>> implements Event<Impl> {
     private DefaultHander<Impl> defaultHander;
-    private Impl impl;
     private Set<EventListener<Impl>> listeners;
 
     /**
@@ -53,25 +52,8 @@ public class AbstractEvent<Impl extends AbstractEvent<?>> implements Event<Impl>
         listeners = new HashSet<>();
     }
 
-    /** Sets impl */
-    protected AbstractEvent<Impl> setImpl(final Impl impl) {
-        this.impl = impl;
-
-        return this;
-    }
-
     @Override public final void register(final EventListener<Impl> listener) {
         listeners.add(listener);
-    }
-
-    @Override public final void run() {
-        for (EventListener<Impl> listener : listeners) {
-            listener.onUpdate(impl);
-        }
-
-        if (defaultHander != null) {
-            defaultHander.handle(impl);
-        }
     }
 
     /** @return the defaultHander */

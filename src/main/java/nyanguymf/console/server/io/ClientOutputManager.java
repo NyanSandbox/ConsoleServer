@@ -42,7 +42,10 @@ public final class ClientOutputManager {
             out.writeObject(packet);
             out.flush();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            System.err.println(
+                "Unable to send packet for client: "
+                + ex.getLocalizedMessage()
+            );
             return false;
         }
 
